@@ -1,0 +1,14 @@
+      - name: Generate tags
+        id: tags
+        run: |
+          echo "SHA=$GITHUB_SHA  $GITHUB_BRANCH"
+          git_ref=$( echo "${GITHUB_REF_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
+          git_hash=${GITHUB_SHA:0:12}
+          date_now=$(date +'%Y%m%dT%Hh%M')
+          container="${{ secrets.ACR_SERVER }}/${{ github.repository }}"
+          tag="${date_now}-${git_ref}-${git_hash}"
+          echo "container=${container} tag=${tag}"
+          # Save variables for next step
+          echo "container=${container}" >> $GITHUB_ENV
+          echo "tag=${tag}" >> $GITHUB_ENV
+          echo "ci_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV
