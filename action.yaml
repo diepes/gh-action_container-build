@@ -13,7 +13,9 @@ runs:
     - id: print
       shell: bash
       run: |
-        echo "heelo from action"
+        echo "start action diepes/gh-action_container-build"
+    - name: Check out code
+      uses: actions/checkout@v3
     - name: Generate tags
       id: tags
       shell: bash
@@ -28,7 +30,19 @@ runs:
           # Save variables for next step
           echo "container=${container}" >> $GITHUB_ENV
           echo "tag=${tag}" >> $GITHUB_ENV
-          echo "ci_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV     
+          echo "ci_url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV    
+
+
+    - name: Build & push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+          image: tm-service
+          platform: linux/amd64
+          tags: ${{ env.tag }}, latest
+          registry: ${{ secrets.ACR_SERVER }}
+          dockerfile: Dockerfile-k8s
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_ACCESSTOKEN }}           
 branding:
   icon: "compass"
   color: "red"
